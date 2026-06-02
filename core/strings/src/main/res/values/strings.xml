@@ -75,6 +75,9 @@
     <string name="book_detail_progress">Progress</string>
     <string name="book_detail_description">Description</string>
     <string name="book_detail_action">Details</string>
+    <string name="collections_title">Collections</string>
+    <string name="collections_add_title">New Collection</string>
+    <string name="collections_name_hint">Collection name</string>
     <string name="close">Close</string>
     <string name="delete">Delete</string>
     <string name="add">Add</string>

@@ -7,11 +7,14 @@ import androidx.room.TypeConverters
 import voice.core.data.BookContent
 import voice.core.data.Bookmark
 import voice.core.data.Chapter
+import voice.core.data.Collection
+import voice.core.data.CollectionBookCrossRef
 import voice.core.data.RecentBookSearch
 import voice.core.data.repo.internals.dao.BookContentDao
 import voice.core.data.repo.internals.dao.BookSearchFts
 import voice.core.data.repo.internals.dao.BookmarkDao
 import voice.core.data.repo.internals.dao.ChapterDao
+import voice.core.data.repo.internals.dao.CollectionDao
 import voice.core.data.repo.internals.dao.RecentBookSearchDao
 import voice.core.data.repo.internals.migrations.Migration56
 
@@ -22,6 +25,8 @@ import voice.core.data.repo.internals.migrations.Migration56
     Bookmark::class,
     BookSearchFts::class,
     RecentBookSearch::class,
+    Collection::class,
+    CollectionBookCrossRef::class,
   ],
   version = AppDb.VERSION,
   autoMigrations = [
@@ -35,6 +40,7 @@ import voice.core.data.repo.internals.migrations.Migration56
     AutoMigration(from = 59, to = 60),
     AutoMigration(from = 60, to = 61),
     AutoMigration(from = 61, to = 62),
+    AutoMigration(from = 62, to = 63),
   ],
 )
 @TypeConverters(Converters::class)
@@ -43,11 +49,12 @@ public abstract class AppDb : RoomDatabase() {
   public abstract fun chapterDao(): ChapterDao
   public abstract fun bookContentDao(): BookContentDao
   public abstract fun bookmarkDao(): BookmarkDao
+  public abstract fun collectionDao(): CollectionDao
 
   public abstract fun recentBookSearchDao(): RecentBookSearchDao
 
   internal companion object {
-    const val VERSION = 62
+    const val VERSION = 63
     const val DATABASE_NAME = "autoBookDB"
   }
 }
