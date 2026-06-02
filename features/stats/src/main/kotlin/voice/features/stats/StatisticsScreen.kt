@@ -236,7 +236,7 @@ private fun StatCard(
   }
 }
 
-private fun calculateStreak(dates: List<String>): Int {
+internal fun calculateStreak(dates: List<String>): Int {
   if (dates.isEmpty()) return 0
   val sortedDates = dates.map { LocalDate.parse(it) }.sortedDescending()
   val today = LocalDate.now()

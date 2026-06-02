@@ -70,6 +70,8 @@ class BookOverviewViewModelTest {
       },
       folderPickerInSettingsFeatureFlag = MemoryFeatureFlag(false),
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(true),
+      bookSortOrderStore = MemoryDataStore("LAST_PLAYED"),
+      libraryStatusFilterStore = MemoryDataStore("ALL"),
     )
 
     backgroundScope.launchMolecule(RecompositionMode.Immediate) {
@@ -98,6 +100,109 @@ class BookOverviewViewModelTest {
       initial.currentBook(currentBook.id) shouldBe currentBook.overlay(livePlaybackState).toItemViewState()
       initial.currentBook(otherBook.id) shouldBe initialOtherItem
       expectNoEvents()
+    }
+  }
+
+  @Test
+  fun `status filter restricts books to matching category`() = runTest {
+    val currentBook = book(name = "Current", time = 500)
+    val notStartedBook = book(name = "NotStarted", time = 0, currentChapter = book(time = 0).chapters.first().id)
+    val filterStore = MemoryDataStore("CURRENT")
+
+    val viewModel = BookOverviewViewModel(
+      repo = mockk<BookRepository> {
+        every { flow() } returns MutableStateFlow(listOf(currentBook, notStartedBook))
+      },
+      mediaScanner = mockk<MediaScanTrigger> {
+        every { scannerActive } returns MutableStateFlow(false)
+        every { scan(any()) } just Runs
+      },
+      playStateManager = PlayStateManager(),
+      playerController = mockk<PlayerController> {
+        every { livePlaybackStateFlow(any()) } returns MutableStateFlow(null)
+      },
+      currentBookStoreDataStore = MemoryDataStore(null),
+      gridModeStore = MemoryDataStore(GridMode.LIST),
+      gridCount = mockk<GridCount> {
+        every { useGridAsDefault() } returns false
+      },
+      navigator = mockk<Navigator>(),
+      recentBookSearchDao = mockk<RecentBookSearchDao> {
+        every { recentBookSearches() } returns MutableStateFlow(emptyList())
+      },
+      search = mockk<BookSearch> {
+        coEvery { search(any()) } returns emptyList()
+      },
+      contentRepo = mockk<BookContentRepo>(),
+      deviceHasStoragePermissionBug = mockk<DeviceHasStoragePermissionBug> {
+        every { hasBug } returns MutableStateFlow(false)
+      },
+      folderPickerInSettingsFeatureFlag = MemoryFeatureFlag(false),
+      experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(false),
+      bookSortOrderStore = MemoryDataStore("LAST_PLAYED"),
+      libraryStatusFilterStore = filterStore,
+    )
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.state()
+    }.test {
+      awaitItem() shouldBe BookOverviewViewState.Loading
+      val state = awaitItem()
+      state.statusFilter shouldBe "CURRENT"
+      val allBookIds = state.books.values.flatMap { it.keys }
+      allBookIds.contains(currentBook.id) shouldBe true
+      allBookIds.contains(notStartedBook.id) shouldBe false
+    }
+  }
+
+  @Test
+  fun `sort order is reflected in view state`() = runTest {
+    val sortStore = MemoryDataStore("TITLE")
+
+    val viewModel = BookOverviewViewModel(
+      repo = mockk<BookRepository> {
+        every { flow() } returns MutableStateFlow(listOf(book(name = "Z"), book(name = "A")))
+      },
+      mediaScanner = mockk<MediaScanTrigger> {
+        every { scannerActive } returns MutableStateFlow(false)
+        every { scan(any()) } just Runs
+      },
+      playStateManager = PlayStateManager(),
+      playerController = mockk<PlayerController> {
+        every { livePlaybackStateFlow(any()) } returns MutableStateFlow(null)
+      },
+      currentBookStoreDataStore = MemoryDataStore(null),
+      gridModeStore = MemoryDataStore(GridMode.LIST),
+      gridCount = mockk<GridCount> {
+        every { useGridAsDefault() } returns false
+      },
+      navigator = mockk<Navigator>(),
+      recentBookSearchDao = mockk<RecentBookSearchDao> {
+        every { recentBookSearches() } returns MutableStateFlow(emptyList())
+      },
+      search = mockk<BookSearch> {
+        coEvery { search(any()) } returns emptyList()
+      },
+      contentRepo = mockk<BookContentRepo>(),
+      deviceHasStoragePermissionBug = mockk<DeviceHasStoragePermissionBug> {
+        every { hasBug } returns MutableStateFlow(false)
+      },
+      folderPickerInSettingsFeatureFlag = MemoryFeatureFlag(false),
+      experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(false),
+      bookSortOrderStore = sortStore,
+      libraryStatusFilterStore = MemoryDataStore("ALL"),
+    )
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.state()
+    }.test {
+      awaitItem() shouldBe BookOverviewViewState.Loading
+      val state = awaitItem()
+      state.sortOrder shouldBe "TITLE"
+      val currentBooks = state.books[BookOverviewCategory.CURRENT]?.values?.map { it.value.name }
+      if (currentBooks != null && currentBooks.size >= 2) {
+        (currentBooks.first() < currentBooks.last()) shouldBe true
+      }
     }
   }
 

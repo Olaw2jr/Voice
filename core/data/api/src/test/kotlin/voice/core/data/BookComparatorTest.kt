@@ -23,4 +23,19 @@ class BookComparatorTest {
     val sorted = books.sortedWith(BookComparator.ByName)
     sorted.shouldContainExactly(b1, b2, b3, b5, b4)
   }
+
+  @Test
+  fun byDateAdded() {
+    val sorted = books.sortedWith(BookComparator.ByDateAdded)
+    sorted.shouldContainExactly(b4, b5, b1, b2, b3)
+  }
+
+  @Test
+  fun byAuthor() {
+    val a = book(name = "X").let { it.copy(content = it.content.copy(author = "Alice")) }
+    val b = book(name = "Y").let { it.copy(content = it.content.copy(author = "Bob")) }
+    val c = book(name = "Z").let { it.copy(content = it.content.copy(author = null)) }
+    val sorted = listOf(b, c, a).sortedWith(BookComparator.ByAuthor)
+    sorted.shouldContainExactly(c, a, b)
+  }
 }
