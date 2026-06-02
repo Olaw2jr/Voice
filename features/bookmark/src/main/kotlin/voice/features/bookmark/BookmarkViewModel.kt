@@ -85,11 +85,15 @@ class BookmarkViewModel(
           else -> currentChapter.markForPosition(bookmark.time).name ?: ""
         }
 
+        val chapterName = currentChapter.markForPosition(bookmark.time).name
+
         BookmarkItemViewState(
           title = title,
           subtitle = formatTime(bookmark.time),
           id = bookmark.id,
           showSleepIcon = bookmark.setBySleepTimer,
+          note = bookmark.note,
+          chapterName = chapterName,
         )
       },
       shouldScrollTo = shouldScrollTo,
@@ -125,20 +129,37 @@ class BookmarkViewModel(
   fun editBookmark(
     id: Bookmark.Id,
     newTitle: String,
+    newNote: String?,
   ) {
     scope.launch {
       bookmarks.find { it.id == id }?.let {
-        val withNewTitle = it.copy(
+        val updated = it.copy(
           title = newTitle,
+          note = newNote?.takeIf { n -> n.isNotBlank() },
           setBySleepTimer = false,
         )
-        bookmarkRepo.addBookmark(withNewTitle)
+        bookmarkRepo.addBookmark(updated)
         val index = bookmarks.indexOfFirst { bookmarkId -> bookmarkId.id == id }
         bookmarks = bookmarks.toMutableList().apply {
-          this[index] = withNewTitle
+          this[index] = updated
         }
       }
     }
+  }
+
+  fun exportBookmarks(): String {
+    val sb = StringBuilder()
+    sb.appendLine("Bookmarks")
+    sb.appendLine("---")
+    bookmarks.forEach { bookmark ->
+      val chapter = chapters.find { it.id == bookmark.chapterId }
+      val chapterName = chapter?.markForPosition(bookmark.time)?.name
+      sb.appendLine("[${chapterName ?: "Unknown"}] ${formatTime(bookmark.time)}")
+      bookmark.title?.let { sb.appendLine("Title: $it") }
+      bookmark.note?.let { sb.appendLine("Note: $it") }
+      sb.appendLine()
+    }
+    return sb.toString()
   }
 
   fun addBookmark(name: String) {
@@ -169,7 +190,7 @@ class BookmarkViewModel(
 
   fun onEditClick(id: Bookmark.Id) {
     val bookmark = bookmarks.find { it.id == id } ?: return
-    dialogViewState = BookmarkDialogViewState.EditBookmark(id, bookmark.title)
+    dialogViewState = BookmarkDialogViewState.EditBookmark(id, bookmark.title, bookmark.note)
   }
 
   fun closeScreen() {

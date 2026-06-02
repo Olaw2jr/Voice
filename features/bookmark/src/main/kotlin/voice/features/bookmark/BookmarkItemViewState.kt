@@ -7,6 +7,8 @@ data class BookmarkItemViewState(
   val subtitle: String,
   val id: Bookmark.Id,
   val showSleepIcon: Boolean,
+  val note: String?,
+  val chapterName: String?,
 )
 
 data class BookmarkViewState(
@@ -21,5 +23,6 @@ sealed interface BookmarkDialogViewState {
   data class EditBookmark(
     val id: Bookmark.Id,
     val title: String?,
+    val note: String?,
   ) : BookmarkDialogViewState
 }

@@ -32,9 +32,10 @@ import voice.core.strings.R as StringsR
 @Composable
 internal fun EditBookmarkDialog(
   onDismissRequest: () -> Unit,
-  onEditBookmark: (Bookmark.Id, String) -> Unit,
+  onEditBookmark: (Bookmark.Id, String, String?) -> Unit,
   bookmarkId: Bookmark.Id,
   initialTitle: String,
+  initialNote: String?,
 ) {
   var bookmarkTitle by remember {
     mutableStateOf(
@@ -43,6 +44,9 @@ internal fun EditBookmarkDialog(
         selection = TextRange(0, initialTitle.length),
       ),
     )
+  }
+  var bookmarkNote by remember {
+    mutableStateOf(initialNote ?: "")
   }
   val focusRequester = remember { FocusRequester() }
 
@@ -63,16 +67,32 @@ internal fun EditBookmarkDialog(
             capitalization = KeyboardCapitalization.Sentences,
             autoCorrectEnabled = true,
             keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next,
+          ),
+        )
+        OutlinedTextField(
+          value = bookmarkNote,
+          onValueChange = { bookmarkNote = it },
+          label = { Text(stringResource(StringsR.string.bookmark_note_hint)) },
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+          keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            autoCorrectEnabled = true,
+            keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done,
           ),
           keyboardActions = KeyboardActions(
             onDone = {
               if (bookmarkTitle.text.isNotEmpty()) {
-                onEditBookmark(bookmarkId, bookmarkTitle.text)
+                onEditBookmark(bookmarkId, bookmarkTitle.text, bookmarkNote.takeIf { it.isNotBlank() })
                 onDismissRequest()
               }
             },
           ),
+          minLines = 2,
+          maxLines = 5,
         )
       }
     },
@@ -80,7 +100,7 @@ internal fun EditBookmarkDialog(
       Button(
         onClick = {
           if (bookmarkTitle.text.isNotEmpty()) {
-            onEditBookmark(bookmarkId, bookmarkTitle.text)
+            onEditBookmark(bookmarkId, bookmarkTitle.text, bookmarkNote.takeIf { it.isNotBlank() })
             onDismissRequest()
           }
         },

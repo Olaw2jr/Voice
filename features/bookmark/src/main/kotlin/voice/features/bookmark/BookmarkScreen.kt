@@ -28,6 +28,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -107,7 +108,7 @@ internal fun BookmarkScreen(
   onClick: (Bookmark.Id) -> Unit,
   onCloseDialog: () -> Unit,
   onNewBookmarkNameChoose: (String) -> Unit,
-  onEditBookmark: (Bookmark.Id, String) -> Unit,
+  onEditBookmark: (Bookmark.Id, String, String?) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
@@ -184,6 +185,7 @@ internal fun BookmarkScreen(
         onEditBookmark = onEditBookmark,
         bookmarkId = viewState.dialogViewState.id,
         initialTitle = viewState.dialogViewState.title ?: "",
+        initialNote = viewState.dialogViewState.note,
       )
     }
   }
@@ -278,7 +280,19 @@ internal fun BookmarkItem(
           }
         },
         supportingContent = {
-          Text(text = bookmark.subtitle)
+          val parts = buildList {
+            bookmark.chapterName?.let { add(it) }
+            add(bookmark.subtitle)
+          }
+          Text(text = parts.joinToString(" · "))
+          bookmark.note?.let {
+            Text(
+              text = it,
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              maxLines = 2,
+            )
+          }
         },
       )
     },
@@ -294,6 +308,8 @@ private fun BookmarkItemPreview() {
       subtitle = "10:10:10 / 12:12:12",
       id = Bookmark.Id(UUID.randomUUID()),
       showSleepIcon = true,
+      note = "An interesting passage",
+      chapterName = "Chapter 3",
     ),
     onDelete = {},
     onEdit = { },
