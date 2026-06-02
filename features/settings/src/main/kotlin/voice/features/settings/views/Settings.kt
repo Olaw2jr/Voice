@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Close
@@ -117,6 +118,20 @@ private fun Settings(
             },
           )
         }
+      }
+      item {
+        ListItem(
+          modifier = Modifier.clickable { listener.openStatistics() },
+          leadingContent = {
+            Icon(
+              imageVector = Icons.Outlined.BarChart,
+              contentDescription = stringResource(StringsR.string.statistics_title),
+            )
+          },
+          headlineContent = {
+            Text(stringResource(StringsR.string.statistics_title))
+          },
+        )
       }
       if (viewState.showDarkThemePref) {
         item {

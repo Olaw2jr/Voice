@@ -167,6 +167,7 @@ dependencies {
   implementation(projects.features.bookmark)
   implementation(projects.features.bookDetail)
   implementation(projects.features.collections)
+  implementation(projects.features.stats)
   implementation(projects.features.widget)
 
   implementation(libs.appCompat)

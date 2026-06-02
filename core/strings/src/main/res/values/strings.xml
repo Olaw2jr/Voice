@@ -78,6 +78,16 @@
     <string name="collections_title">Collections</string>
     <string name="collections_add_title">New Collection</string>
     <string name="collections_name_hint">Collection name</string>
+    <string name="statistics_title">Listening Statistics</string>
+    <string name="statistics_today">Today</string>
+    <string name="statistics_week">This Week</string>
+    <string name="statistics_month">This Month</string>
+    <string name="statistics_all_time">All Time</string>
+    <string name="statistics_streak">Streak</string>
+    <string name="statistics_days">days</string>
+    <string name="statistics_achievements">Badges</string>
+    <string name="statistics_level">Level: %s</string>
+    <string name="statistics_levels_title">Listening Levels</string>
     <string name="close">Close</string>
     <string name="delete">Delete</string>
     <string name="add">Add</string>

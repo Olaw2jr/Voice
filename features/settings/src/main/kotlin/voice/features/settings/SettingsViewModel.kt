@@ -229,4 +229,8 @@ class SettingsViewModel(
   override fun openDeveloperMenu() {
     navigator.goTo(Destination.DeveloperSettings)
   }
+
+  override fun openStatistics() {
+    navigator.goTo(Destination.Statistics)
+  }
 }

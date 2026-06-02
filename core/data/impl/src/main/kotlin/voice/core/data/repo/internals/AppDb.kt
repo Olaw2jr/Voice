@@ -4,17 +4,21 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import voice.core.data.Achievement
 import voice.core.data.BookContent
 import voice.core.data.Bookmark
 import voice.core.data.Chapter
 import voice.core.data.Collection
 import voice.core.data.CollectionBookCrossRef
+import voice.core.data.ListeningSession
 import voice.core.data.RecentBookSearch
+import voice.core.data.repo.internals.dao.AchievementDao
 import voice.core.data.repo.internals.dao.BookContentDao
 import voice.core.data.repo.internals.dao.BookSearchFts
 import voice.core.data.repo.internals.dao.BookmarkDao
 import voice.core.data.repo.internals.dao.ChapterDao
 import voice.core.data.repo.internals.dao.CollectionDao
+import voice.core.data.repo.internals.dao.ListeningSessionDao
 import voice.core.data.repo.internals.dao.RecentBookSearchDao
 import voice.core.data.repo.internals.migrations.Migration56
 
@@ -27,6 +31,8 @@ import voice.core.data.repo.internals.migrations.Migration56
     RecentBookSearch::class,
     Collection::class,
     CollectionBookCrossRef::class,
+    ListeningSession::class,
+    Achievement::class,
   ],
   version = AppDb.VERSION,
   autoMigrations = [
@@ -41,6 +47,7 @@ import voice.core.data.repo.internals.migrations.Migration56
     AutoMigration(from = 60, to = 61),
     AutoMigration(from = 61, to = 62),
     AutoMigration(from = 62, to = 63),
+    AutoMigration(from = 63, to = 64),
   ],
 )
 @TypeConverters(Converters::class)
@@ -50,11 +57,13 @@ public abstract class AppDb : RoomDatabase() {
   public abstract fun bookContentDao(): BookContentDao
   public abstract fun bookmarkDao(): BookmarkDao
   public abstract fun collectionDao(): CollectionDao
+  public abstract fun listeningSessionDao(): ListeningSessionDao
+  public abstract fun achievementDao(): AchievementDao
 
   public abstract fun recentBookSearchDao(): RecentBookSearchDao
 
   internal companion object {
-    const val VERSION = 63
+    const val VERSION = 64
     const val DATABASE_NAME = "autoBookDB"
   }
 }

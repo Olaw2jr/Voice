@@ -111,4 +111,9 @@ sealed interface Destination {
   data class CollectionDetail(val collectionId: String) : Compose {
     override val trackingName: String get() = "CollectionDetail"
   }
+
+  @Serializable
+  data object Statistics : Compose {
+    override val trackingName: String get() = "Statistics"
+  }
 }
