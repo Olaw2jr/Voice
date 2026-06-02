@@ -30,6 +30,18 @@ public data class BookContent(
   val part: String?,
   @ColumnInfo(defaultValue = "NULL")
   val completedAt: Instant?,
+  @ColumnInfo(defaultValue = "NULL")
+  val description: String? = null,
+  @ColumnInfo(defaultValue = "NULL")
+  val publisher: String? = null,
+  @ColumnInfo(defaultValue = "NULL")
+  val publishedDate: String? = null,
+  @ColumnInfo(defaultValue = "NULL")
+  val language: String? = null,
+  @ColumnInfo(defaultValue = "NULL")
+  val rating: Float? = null,
+  @ColumnInfo(defaultValue = "NULL")
+  val seriesTotal: Int? = null,
 ) {
 
   @Ignore

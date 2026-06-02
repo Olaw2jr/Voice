@@ -96,4 +96,9 @@ sealed interface Destination {
   data class AddContent(val origin: Origin) : Compose {
     override val trackingName: String = "AddContent"
   }
+
+  @Serializable
+  data class BookDetail(val bookId: BookId) : Compose {
+    override val trackingName: String get() = "BookDetail"
+  }
 }
