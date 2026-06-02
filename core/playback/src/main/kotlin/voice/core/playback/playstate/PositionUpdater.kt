@@ -103,13 +103,24 @@ class PositionUpdater(
     val mediaId = mediaItem.mediaId.toMediaIdOrNull() ?: return
     mediaId as MediaId.Chapter
     val chapterId = mediaId.chapterId
+    val book = bookRepo.get(mediaId.bookId)
+    val lastChapterDuration = book?.chapters?.lastOrNull()?.duration
+
     bookRepo.updateBook(mediaId.bookId) { content ->
       if (chapterId in content.chapters) {
         Logger.d("$currentPosition is the new position!")
+        val isLastChapter = chapterId == content.chapters.last()
+        val nearEnd = isLastChapter && lastChapterDuration != null &&
+          currentPosition >= lastChapterDuration - 5000
         content.copy(
           currentChapter = chapterId,
           positionInChapter = currentPosition,
           lastPlayedAt = Instant.now(),
+          completedAt = when {
+            nearEnd && content.completedAt == null -> Instant.now()
+            !nearEnd && content.completedAt != null -> null
+            else -> content.completedAt
+          },
         )
       } else {
         Logger.w("$mediaId not in $content")

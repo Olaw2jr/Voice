@@ -59,6 +59,7 @@ internal class BookParser(
       narrator = analyzed?.narrator,
       series = analyzed?.series,
       part = analyzed?.part,
+      completedAt = null,
     ).also {
       validateIntegrity(it, chapters)
     }

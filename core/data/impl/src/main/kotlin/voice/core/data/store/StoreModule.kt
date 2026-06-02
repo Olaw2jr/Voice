@@ -179,4 +179,26 @@ public interface StoreModule {
       fileName = "featureFlagOverrides",
     )
   }
+
+  @Provides
+  @SingleIn(AppScope::class)
+  @BookSortOrderStore
+  private fun bookSortOrder(factory: VoiceDataStoreFactory): DataStore<String> {
+    return factory.create(
+      serializer = String.serializer(),
+      defaultValue = "LAST_PLAYED",
+      fileName = "bookSortOrder",
+    )
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
+  @LibraryStatusFilterStore
+  private fun libraryStatusFilter(factory: VoiceDataStoreFactory): DataStore<String> {
+    return factory.create(
+      serializer = String.serializer(),
+      defaultValue = "ALL",
+      fileName = "libraryStatusFilter",
+    )
+  }
 }

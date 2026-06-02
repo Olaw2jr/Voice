@@ -191,6 +191,8 @@ class ScreenshotCapture {
       searchViewState = BookSearchViewState.EmptySearch(emptyList(), emptyList(), ""),
       showStoragePermissionBugCard = false,
       showFolderPickerIcon = true,
+      sortOrder = "LAST_PLAYED",
+      statusFilter = "ALL",
     )
   }
 }

@@ -24,11 +24,14 @@ import voice.core.common.comparator.sortedNaturally
 import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.GridMode
+import voice.core.data.BookComparator
 import voice.core.data.repo.BookContentRepo
 import voice.core.data.repo.BookRepository
 import voice.core.data.repo.internals.dao.RecentBookSearchDao
+import voice.core.data.store.BookSortOrderStore
 import voice.core.data.store.CurrentBookStore
 import voice.core.data.store.GridModeStore
+import voice.core.data.store.LibraryStatusFilterStore
 import voice.core.featureflag.ExperimentalPlaybackPersistenceQualifier
 import voice.core.featureflag.FeatureFlag
 import voice.core.featureflag.FolderPickerInSettingsFeatureFlagQualifier
@@ -66,6 +69,10 @@ class BookOverviewViewModel(
   private val folderPickerInSettingsFeatureFlag: FeatureFlag<Boolean>,
   @ExperimentalPlaybackPersistenceQualifier
   private val experimentalPlaybackPersistenceFeatureFlag: FeatureFlag<Boolean>,
+  @BookSortOrderStore
+  private val bookSortOrderStore: DataStore<String>,
+  @LibraryStatusFilterStore
+  private val libraryStatusFilterStore: DataStore<String>,
 ) {
 
   private val scope = MainScope()
@@ -92,6 +99,27 @@ class BookOverviewViewModel(
       .collectAsState(initial = null).value
       ?: return BookOverviewViewState.Loading
 
+    val sortOrder = remember { bookSortOrderStore.data }
+      .collectAsState(initial = "LAST_PLAYED").value
+    val statusFilter = remember { libraryStatusFilterStore.data }
+      .collectAsState(initial = "ALL").value
+
+    val filteredBooks = if (statusFilter == "ALL") {
+      books
+    } else {
+      val filterCategory = when (statusFilter) {
+        "CURRENT" -> BookOverviewCategory.CURRENT
+        "NOT_STARTED" -> BookOverviewCategory.NOT_STARTED
+        "FINISHED" -> BookOverviewCategory.FINISHED
+        else -> null
+      }
+      if (filterCategory != null) {
+        books.filter { it.category == filterCategory }
+      } else {
+        books
+      }
+    }
+
     val noBooks = !scannerActive && books.isEmpty()
 
     val layoutMode = when (gridMode) {
@@ -114,15 +142,22 @@ class BookOverviewViewModel(
       remember { mutableStateOf(null) }
     }
 
+    val sortComparator = when (sortOrder) {
+      "TITLE" -> BookComparator.ByName
+      "AUTHOR" -> BookComparator.ByAuthor
+      "DATE_ADDED" -> BookComparator.ByDateAdded
+      else -> null
+    }
+
     return BookOverviewViewState(
       layoutMode = layoutMode,
-      books = books
+      books = filteredBooks
         .groupBy {
           it.category
         }
         .mapValues { (category, books) ->
           books
-            .sortedWith(category.comparator)
+            .sortedWith(sortComparator ?: category.comparator)
             .associate { book ->
               book.id to book.itemViewState(
                 currentBookId = currentBookId,
@@ -147,6 +182,8 @@ class BookOverviewViewModel(
       searchViewState = bookSearchViewState,
       showStoragePermissionBugCard = hasStoragePermissionBug,
       showFolderPickerIcon = !folderPickerInSettingsFeatureFlag.get(),
+      sortOrder = sortOrder,
+      statusFilter = statusFilter,
     )
   }
 
@@ -229,6 +266,18 @@ class BookOverviewViewModel(
 
   fun playPause() {
     playerController.playPause()
+  }
+
+  fun onSortOrderChange(order: String) {
+    scope.launch {
+      bookSortOrderStore.updateData { order }
+    }
+  }
+
+  fun onStatusFilterChange(filter: String) {
+    scope.launch {
+      libraryStatusFilterStore.updateData { filter }
+    }
   }
 
   fun onPermissionBugCardClick() {

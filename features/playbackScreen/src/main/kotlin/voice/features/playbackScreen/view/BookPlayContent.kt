@@ -9,11 +9,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import voice.core.ui.formatTime
 import voice.features.playbackScreen.BookPlayViewState
 import kotlin.time.Duration
+import voice.core.strings.R as StringsR
 
 @Composable
 internal fun BookPlayContent(
@@ -60,6 +66,7 @@ internal fun BookPlayContent(
           playedTime = viewState.playedTime,
           onSeek = onSeek,
         )
+        BookRemainingTime(viewState.bookRemainingTime)
         Spacer(modifier = Modifier.size(16.dp))
         PlaybackRow(
           playing = viewState.playing,
@@ -96,6 +103,7 @@ internal fun BookPlayContent(
         playedTime = viewState.playedTime,
         onSeek = onSeek,
       )
+      BookRemainingTime(viewState.bookRemainingTime)
       Spacer(modifier = Modifier.size(16.dp))
       PlaybackRow(
         playing = viewState.playing,
@@ -106,4 +114,19 @@ internal fun BookPlayContent(
       Spacer(modifier = Modifier.size(24.dp))
     }
   }
+}
+
+@Composable
+private fun BookRemainingTime(remainingTime: Duration) {
+  Text(
+    text = stringResource(
+      StringsR.string.book_remaining_time,
+      formatTime(remainingTime.inWholeMilliseconds),
+    ),
+    style = MaterialTheme.typography.labelSmall,
+    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 16.dp, vertical = 4.dp),
+  )
 }

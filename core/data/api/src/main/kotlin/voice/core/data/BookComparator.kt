@@ -14,4 +14,16 @@ public enum class BookComparator(private val comparatorFunction: Comparator<Book
       NaturalOrderComparator.stringComparator.compare(left.content.name, right.content.name)
     },
   ),
+  ByDateAdded(
+    compareByDescending {
+      it.content.addedAt
+    },
+  ),
+  ByAuthor(
+    Comparator { left, right ->
+      val leftAuthor = left.content.author ?: ""
+      val rightAuthor = right.content.author ?: ""
+      NaturalOrderComparator.stringComparator.compare(leftAuthor, rightAuthor)
+    },
+  ),
 }

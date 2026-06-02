@@ -34,6 +34,7 @@ fun book(
       narrator = null,
       series = null,
       part = null,
+      completedAt = null,
     ),
     chapters = chapters,
   )

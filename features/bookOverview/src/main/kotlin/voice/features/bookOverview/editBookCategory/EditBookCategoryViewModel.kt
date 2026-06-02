@@ -9,6 +9,7 @@ import voice.features.bookOverview.bottomSheet.BottomSheetItemViewModel
 import voice.features.bookOverview.di.BookOverviewScope
 import voice.features.bookOverview.overview.BookOverviewCategory
 import voice.features.bookOverview.overview.category
+import java.time.Instant
 
 @SingleIn(BookOverviewScope::class)
 @ContributesIntoSet(BookOverviewScope::class)
@@ -52,10 +53,17 @@ class EditBookCategoryViewModel(private val repo: BookRepository) : BottomSheetI
       else -> return
     }
 
+    val completedAt = if (item == BottomSheetItem.BookCategoryMarkAsCompleted) {
+      Instant.now()
+    } else {
+      null
+    }
+
     repo.updateBook(book.id) {
       it.copy(
         currentChapter = currentChapter,
         positionInChapter = positionInChapter,
+        completedAt = completedAt,
       )
     }
   }

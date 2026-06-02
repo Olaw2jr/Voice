@@ -17,6 +17,8 @@ data class BookOverviewViewState(
   val searchViewState: BookSearchViewState,
   val showStoragePermissionBugCard: Boolean,
   val showFolderPickerIcon: Boolean,
+  val sortOrder: String,
+  val statusFilter: String,
 ) {
 
   companion object {
@@ -35,6 +37,8 @@ data class BookOverviewViewState(
       ),
       showStoragePermissionBugCard = false,
       showFolderPickerIcon = true,
+      sortOrder = "LAST_PLAYED",
+      statusFilter = "ALL",
     )
   }
 

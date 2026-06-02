@@ -26,13 +26,13 @@ enum class BookOverviewCategory(
 
 val Book.category: BookOverviewCategory
   get() {
-    return if (position == 0L) {
+    return if (content.completedAt != null) {
+      BookOverviewCategory.FINISHED
+    } else if (position == 0L) {
       BookOverviewCategory.NOT_STARTED
+    } else if (position >= duration - SECONDS.toMillis(5)) {
+      BookOverviewCategory.FINISHED
     } else {
-      if (position >= duration - SECONDS.toMillis(5)) {
-        BookOverviewCategory.FINISHED
-      } else {
-        BookOverviewCategory.CURRENT
-      }
+      BookOverviewCategory.CURRENT
     }
   }

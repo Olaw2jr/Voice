@@ -17,14 +17,19 @@ data class BookOverviewItemViewState(
   val remainingTime: String,
 )
 
-internal fun Book.toItemViewState() = BookOverviewItemViewState(
-  name = content.name,
-  author = content.author,
-  cover = content.cover?.let(::ImmutableFile),
-  id = id,
-  progress = progress(),
-  remainingTime = formatTime(duration - position),
-)
+internal fun Book.toItemViewState(): BookOverviewItemViewState {
+  val remaining = (duration - position).coerceAtLeast(0L)
+  val speed = content.playbackSpeed.coerceAtLeast(0.1f)
+  val remainingAtSpeed = (remaining / speed).toLong()
+  return BookOverviewItemViewState(
+    name = content.name,
+    author = content.author,
+    cover = content.cover?.let(::ImmutableFile),
+    id = id,
+    progress = progress(),
+    remainingTime = formatTime(remainingAtSpeed),
+  )
+}
 
 private fun Book.progress(): Float {
   val globalPosition = position

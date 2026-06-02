@@ -120,6 +120,9 @@ class BookPlayViewModel(
 
     val sleepTime = remember { sleepTimer.state }.collectAsState().value
     val hasMoreThanOneChapter = book.chapters.sumOf { it.chapterMarks.count() } > 1
+    val bookRemaining = (book.duration - book.position).coerceAtLeast(0L)
+    val speed = book.content.playbackSpeed.coerceAtLeast(0.1f)
+    val bookRemainingAtSpeed = (bookRemaining / speed).toLong()
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -130,6 +133,7 @@ class BookPlayViewModel(
       playedTime = positionInCurrentMark.milliseconds,
       cover = book.content.cover?.let(::ImmutableFile),
       skipSilence = book.content.skipSilence,
+      bookRemainingTime = bookRemainingAtSpeed.milliseconds,
     )
   }
 
